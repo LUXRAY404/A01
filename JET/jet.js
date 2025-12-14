@@ -31,7 +31,6 @@ var doodle = (function() {
     };
 
     var fps = 0, now, lastUpdate = (new Date) * 1 - 1;
-
     var fpsFilter = 50;
     var set_fps = function() {
         var thisFrameFPS = 1000 / ((now = new Date) - lastUpdate);
@@ -43,7 +42,6 @@ var doodle = (function() {
         if (this.destroyed) {
             return;
         }
-
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
 
         for (var i in this.objects) {
@@ -64,7 +62,6 @@ var doodle = (function() {
         } else if (!this.paused) {
             requestAnimationFrame(this.frame.bind(this))
         }
-
     };
 
     Stage.prototype.setup = function() {
@@ -106,7 +103,6 @@ var doodle = (function() {
                 this.planes[i].tick(ctx);
             }
         }
-
         if (this.planes.length == 0) {
             this.destroy();
         }
@@ -116,7 +112,7 @@ var doodle = (function() {
         this.destroyed = true;
     };
 
-    // --- এই ফাংশনটি আপডেট করা হয়েছে (5 Planes Logic) ---
+    // --- 5-PLANE FORMATION LOGIC (Red Center, Green Sides) ---
     var getRandomFormation = function(stage) {
         var y_to_zero = Math.random() > 0.5 ? true : false
         var init_y = y_to_zero ? stage.ctx.canvas.height : 10 + (stage.ctx.canvas.height - 10) * Math.random();
@@ -146,7 +142,6 @@ var doodle = (function() {
         formation.travelTo(target_x, target_y, 3 + 3 * Math.random());
         return formation;
     };
-    // ----------------------------------------------------
 
     var JetPlane = function(img, initX, initY, smoke_rgb, formation_x, formation_y) {
         this.img = img
@@ -166,7 +161,6 @@ var doodle = (function() {
         var angle = Math.atan(this.pather.slope) + PI_half;
         ctx.translate(this.x, this.y);
         ctx.rotate(angle)
-
         ctx.drawImage(this.img, 0, 0);
         ctx.restore();
 
@@ -214,7 +208,6 @@ var doodle = (function() {
         this.destroyed = true;
     }
 
-
     var PathMaker = function() {
         this.speed = 2.5;
         this.slope = null
@@ -242,7 +235,6 @@ var doodle = (function() {
         this.y = this.y + Math.sin(Math.atan(this.slope)) * this.speed;
     }
 
-
     var SmokeParticle = function (paramX, paramY, rgb) {
         this.x = paramX;
         this.y = paramY;
@@ -253,11 +245,9 @@ var doodle = (function() {
 
     SmokeParticle.prototype.draw = function(ctx) {
         ctx.save();
-
         ctx.beginPath();
         ctx.fillStyle = 'rgba(' + this.rgb + ',' + this.opacity + ')';
         ctx.shadowColor = 'rgba(' + this.rgb + ',1)';
-
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
         ctx.fill();
 
@@ -266,13 +256,15 @@ var doodle = (function() {
         if (this.opacity <= 0) {
             this.destroyed = true;
         }
-        ;
-
         ctx.restore();
     };
 
     var stage;
     var init = function(jet_img_src) {
+        // --- IMAGE URL LOGIC ADDED HERE ---
+        // If no URL is provided, use this one by default.
+        // I also converted the blob URL to raw.githubusercontent to make it work.
+        var final_src = jet_img_src || "https://raw.githubusercontent.com/LUXRAY404/A01/main/JET/jet.png";
 
         var canvas = document.createElement('canvas');
         canvas.id = "canvas_doodle";
@@ -287,12 +279,11 @@ var doodle = (function() {
         document.body.appendChild(canvas);
         stage = new Stage(canvas);
         resources.jet_img = new Image();
-        resources.jet_img.src = jet_img_src;
+        resources.jet_img.src = final_src;
         resources.jet_img.onload = function() {
             stage.setup();
             requestAnimationFrame(stage.frame.bind(stage))
         }
-
     };
 
     var destroy = function() {
@@ -307,5 +298,4 @@ var doodle = (function() {
         "init":init,
         "destroy":destroy
     }
-
 })();
